@@ -1,0 +1,66 @@
+services:
+  postgres:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+
+  # --------------------------------------------------------
+  # ADICIONADO - Interface Gráfica para o Banco de Dados
+  # --------------------------------------------------------
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+
+  airflow:
+    # SPRINT 3 - build de imagem custom (ver ./Dockerfile) em vez da imagem
+    # oficial + _PIP_ADDITIONAL_REQUIREMENTS. O _PIP_ADDITIONAL_REQUIREMENTS
+    # reinstala os pacotes do zero a cada start do container, sem versoes
+    # fixadas - isso causava combinacoes incompativeis de geopandas/fiona/
+    # shapely/rtree entre execucoes (AttributeError: fiona.path; ImportError:
+    # rtree/pygeos). Com o build, as versoes ficam fixadas uma unica vez na
+    # imagem (ver requirements.txt), tornando o ambiente reprodutivel.
+    build: .
+    environment:
+      # SPRINT 1 - Configurações base do Airflow
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+      - _AIRFLOW_DB_UPGRADE=True
+      - _AIRFLOW_WWW_USER_CREATE=True
+      - _AIRFLOW_WWW_USER_USERNAME=${AIRFLOW_USER}
+      - _AIRFLOW_WWW_USER_PASSWORD=${AIRFLOW_PASSWORD}
+
+      # SPRINT 2 - Configurações para o ETL (DAG aracaju_import)
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    command: standalone
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./logs:/opt/airflow/logs
+      - ./plugins:/opt/airflow/plugins
+      - ./data:/opt/airflow/data
+      # SPRINT 3 - Malha Territorial do IBGE (shapefile BR_Municipios_2025)
+      # usada pela DAG etl_geocoding_pipeline para o filtro geográfico de UF.
+      - ./geo:/opt/airflow/geo
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:

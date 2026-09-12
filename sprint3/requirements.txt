@@ -1,0 +1,9 @@
+pandas==2.0.3
+psycopg2-binary==2.9.9
+requests==2.31.0
+shapely==2.0.4
+pyproj==3.5.0
+fiona==1.9.5
+geopandas==0.13.2
+rtree==1.0.1
+SQLAlchemy==1.4.51

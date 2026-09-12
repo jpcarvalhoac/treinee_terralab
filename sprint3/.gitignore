@@ -1,0 +1,19 @@
+.env
+__pycache__/
+logs/
+venv/
+.venv/
+*.pyc
+
+# SPRINT 3 - Malha Territorial do IBGE (~300MB, baixada/extraída localmente
+# por cada ambiente - ver geo/README.md) e cache/arquivos intermediários
+# gerados pela pipeline etl_geocoding_pipeline.
+geo/*.shp
+geo/*.shx
+geo/*.dbf
+geo/*.prj
+geo/*.cpg
+geo/*.qmd
+geo/LEIA-ME.txt
+geo/uf_cache/*.geojson
+data/_intermediate/

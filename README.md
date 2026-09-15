@@ -45,10 +45,4 @@ O gerente da sua equipe será responsável por:
 - Avaliar suas entregas;
 - Fornecer feedbacks ao longo do processo.
 
-## 💬 Comunicação
 
-Cada equipe contará com um **grupo de WhatsApp** próprio para facilitar a comunicação entre os membros. Você será convidado(a) pelo seu gerente em breve — aguarde o contato!
-
----
-
-Bons estudos e boa sorte no processo seletivo! 🚀
